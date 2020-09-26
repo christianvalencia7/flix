@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AlamofireImage
 
 class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -18,7 +19,6 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         tableView.delegate = self
         tableView.dataSource = self
-        
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
@@ -29,21 +29,34 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
            } else if let data = data {
               let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
               self.movies = dataDictionary["results"] as! [[String:Any]]
+              self.tableView.reloadData()
            }
         }
         task.resume()
+        
+        
         // Do any additional setup after loading the view.
     }
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 50
+        return movies.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell") as! MovieCell
+        let movie = movies[indexPath.row]
         
-        cell.textLabel!.text = "Hello"
+        let title = movie["title"] as! String
+        cell.titleLabel!.text = title
+        
+        let synopsis = movie["overview"] as! String
+        cell.synopsisLabel!.text = synopsis
+        
+        let baseUrl = "https://image.tmdb.org/t/p/w185"
+        let posterPath = movie["poster_path"] as! String
+        
+        let posterUrl = URL(string: baseUrl + posterPath)
         
         return cell
     }
