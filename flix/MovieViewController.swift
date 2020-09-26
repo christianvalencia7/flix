@@ -56,7 +56,9 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
         let baseUrl = "https://image.tmdb.org/t/p/w185"
         let posterPath = movie["poster_path"] as! String
         
-        let posterUrl = URL(string: baseUrl + posterPath)
+        let posterUrl = URL(string: baseUrl + posterPath)!
+        
+        cell.poster.af_setImage(withURL: posterUrl)
         
         return cell
     }
